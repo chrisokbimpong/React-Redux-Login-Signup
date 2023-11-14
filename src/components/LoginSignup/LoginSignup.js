@@ -6,6 +6,7 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signup, login } from "../../redux/loginsignupSlice";
+import { validateEmail, validatePassword } from "../../helpers/helpersEmail";
 
 export const LoginSignup = () => {
   const [action, setAction] = useState("Sign Up");
@@ -13,12 +14,39 @@ export const LoginSignup = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
+  const [emailErrors, setEmailErrors] = useState({ type: null, message: null });
+  const [passwordErrors, setPasswordErrors] = useState({
+    type: null,
+    message: null,
+  });
+
   const loginsignup = useSelector((state) => state.loginsignup);
   const dispatch = useDispatch();
 
   const handleSignup = (e) => {
     e.preventDefault();
-    dispatch(signup({ username, email, password }));
+
+    let isValidEmail = validateEmail(email);
+    let isValidPassword = validatePassword(password);
+    if (isValidEmail && isValidPassword) {
+      dispatch(signup({ username, email, password }));
+    } else {
+      if (!isValidEmail) {
+        setEmailErrors({
+          type: "email",
+          message: "You entered an invalid email",
+        });
+      }
+      if (!isValidPassword) {
+        setPasswordErrors({
+          type: "password",
+          message: "Your password is incorrect",
+        });
+      }
+    }
+
+    console.log("isvalidemail", isValidEmail);
+    console.log("isvalidpassword", isValidPassword);
   };
 
   const handleLogin = (e) => {
@@ -26,7 +54,9 @@ export const LoginSignup = () => {
     dispatch(login({ email, password }));
   };
 
-  console.log(loginsignup.password);
+  const isDisabled = () => {
+    return password === "" || email === "" || username === "" ? true : false;
+  };
 
   return (
     <div className="container">
@@ -54,6 +84,9 @@ export const LoginSignup = () => {
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           />
+          {emailErrors.type === "email" && (
+            <small color="red">{emailErrors.message}</small>
+          )}
         </div>
         <div className="input">
           <RiLockPasswordLine className="icons password" />
@@ -62,6 +95,9 @@ export const LoginSignup = () => {
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
           />
+          {passwordErrors.type === "password" && (
+            <small color="red">{passwordErrors.message}</small>
+          )}
         </div>
       </div>
       {action === "Sign Up" ? (
@@ -74,7 +110,11 @@ export const LoginSignup = () => {
       <div>
         {action === "Sign Up" ? (
           <div className="new-user">
-            <button className="button-18" onClick={handleSignup}>
+            <button
+              className="button-18"
+              onClick={handleSignup}
+              disabled={isDisabled()}
+            >
               Submit
             </button>
           </div>
