@@ -5,10 +5,10 @@ import { LoginSignup } from "./components/LoginSignup/LoginSignup";
 function App() {
   return (
     <>
-      <div>{/* <LoginSignup /> */}</div>
       <div>
-        <ReactHookForm />
+        <LoginSignup />
       </div>
+      <div>{/* <ReactHookForm /> */}</div>
     </>
   );
 }
