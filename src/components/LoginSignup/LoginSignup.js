@@ -1,12 +1,13 @@
 import React from "react";
-import "./loginsignup.css";
-import { FaUser } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
-import { RiLockPasswordLine } from "react-icons/ri";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signup, login } from "../../redux/loginsignupSlice";
 import { validateEmail, validatePassword } from "../../helpers/helpersEmail";
+import Button from "@mui/material/Button";
+import Box from "@mui/system/Box";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import { Typography, Link } from "@mui/material";
 
 export const LoginSignup = () => {
   const [action, setAction] = useState("Sign Up");
@@ -14,11 +15,8 @@ export const LoginSignup = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  const [emailErrors, setEmailErrors] = useState({ type: null, message: null });
-  const [passwordErrors, setPasswordErrors] = useState({
-    type: null,
-    message: null,
-  });
+  const [emailErrors, setEmailErrors] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState("");
 
   const loginsignup = useSelector((state) => state.loginsignup);
   const dispatch = useDispatch();
@@ -30,23 +28,23 @@ export const LoginSignup = () => {
     let isValidPassword = validatePassword(password);
     if (isValidEmail && isValidPassword) {
       dispatch(signup({ username, email, password }));
+    }
+    if (!isValidEmail) {
+      console.log("Invalid email");
+      setEmailErrors("Please enter a valid email");
     } else {
-      if (!isValidEmail) {
-        setEmailErrors({
-          type: "email",
-          message: "You entered an invalid email",
-        });
-      }
-      if (!isValidPassword) {
-        setPasswordErrors({
-          type: "password",
-          message: "Your password is incorrect",
-        });
-      }
+      console.log("valid email");
+      setEmailErrors("");
+    }
+    if (!isValidPassword) {
+      console.log("Invalid password");
+      setPasswordErrors("Please enter a valid password");
+    } else {
+      setPasswordErrors("");
     }
 
-    console.log("isvalidemail", isValidEmail);
-    console.log("isvalidpassword", isValidPassword);
+    console.log("isValidEmail:", isValidEmail, emailErrors);
+    console.log("isValidPassword:", isValidPassword, passwordErrors);
   };
 
   const handleLogin = (e) => {
@@ -59,87 +57,110 @@ export const LoginSignup = () => {
   };
 
   return (
-    <div className="container">
-      <div className="header">
-        <div className="text">{action}</div>
-        <div className="underline"></div>
-      </div>
-      <div className="inputs">
-        {action === "Login" ? (
-          <div></div>
-        ) : (
-          <div className="input">
-            <FaUser className="icons username" />
-            <input
+    <Box
+      sx={{
+        width: "100vw",
+        display: "flex",
+        justifyContent: "center",
+        direction: "column",
+        alignItems: "center",
+      }}
+    >
+      <form>
+        <Stack
+          spacing={2}
+          width={300}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            left: "50%",
+            top: "50%",
+            position: "absolute",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <Typography variant="h2" sx={{ fontWeight: 400 }}>
+            {action}
+          </Typography>
+          {action === "Login" ? (
+            <Typography></Typography>
+          ) : (
+            <TextField
+              label="Username"
+              color="secondary"
               type="text"
-              placeholder="Username"
+              focused
               onChange={(e) => setUsername(e.target.value)}
             />
-          </div>
-        )}
-        <div className="input">
-          <MdEmail className="icons email" />
-          <input
-            type="email"
-            placeholder="Email"
+          )}
+          <TextField
+            label="Email"
+            color="secondary"
+            type="text"
+            focused
             onChange={(e) => setEmail(e.target.value)}
           />
-          {emailErrors.type === "email" && (
-            <small color="red">{emailErrors.message}</small>
-          )}
-        </div>
-        <div className="input">
-          <RiLockPasswordLine className="icons password" />
-          <input
-            type="password"
-            placeholder="Password"
+          {
+            <Typography variant="subtitle2" color="red">
+              {emailErrors}
+            </Typography>
+          }
+          <TextField
+            label="Password"
+            color="secondary"
+            type="text"
+            focused
             onChange={(e) => setPassword(e.target.value)}
           />
-          {passwordErrors.type === "password" && (
-            <small color="red">{passwordErrors.message}</small>
+          {
+            <Typography variant="subtitle2" color="red">
+              {passwordErrors}
+            </Typography>
+          }
+
+          {action === "Sign Up" ? (
+            <Typography></Typography>
+          ) : (
+            <Typography variant="subtitle2" className="forgot-password">
+              Lost password? <Link underline="hover">Click here!</Link>
+            </Typography>
           )}
-        </div>
-      </div>
-      {action === "Sign Up" ? (
-        <div></div>
-      ) : (
-        <div className="forgot-password">
-          Lost password? <span>Click here!</span>
-        </div>
-      )}
-      <div>
-        {action === "Sign Up" ? (
-          <div className="new-user">
-            <button
-              className="button-18"
+
+          {action === "Sign Up" ? (
+            <Button
+              variant="outlined"
+              color="secondary"
               onClick={handleSignup}
               disabled={isDisabled()}
             >
               Submit
-            </button>
-          </div>
-        ) : (
-          <div className="new-user">
-            <button className="button-18" onClick={handleLogin}>
+            </Button>
+          ) : (
+            <Button variant="outlined" color="secondary" onClick={handleLogin}>
               Submit
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="submit-container">
-        <div
-          className={action === "Login" ? "submit gray" : "submit"}
-          onClick={() => setAction("Sign Up")}
-        >
-          Sign Up
-        </div>
-        <div
-          className={action === "Sign Up" ? "submit gray" : "submit"}
-          onClick={() => setAction("Login")}
-        >
-          Login
-        </div>
-      </div>
-    </div>
+            </Button>
+          )}
+
+          <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
+            <Button
+              variant="text"
+              sx={{ flex: 1 }}
+              onClick={() => setAction("Sign Up")}
+              color="secondary"
+            >
+              Sign Up
+            </Button>
+            <Button
+              variant="text"
+              sx={{ flex: 1 }}
+              onClick={() => setAction("Login")}
+              color="secondary"
+            >
+              Login
+            </Button>
+          </Stack>
+        </Stack>
+      </form>
+    </Box>
   );
 };
