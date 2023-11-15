@@ -14,11 +14,8 @@ export const LoginSignup = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  const [emailErrors, setEmailErrors] = useState({ type: null, message: null });
-  const [passwordErrors, setPasswordErrors] = useState({
-    type: null,
-    message: null,
-  });
+  const [emailErrors, setEmailErrors] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState("");
 
   const loginsignup = useSelector((state) => state.loginsignup);
   const dispatch = useDispatch();
@@ -30,23 +27,23 @@ export const LoginSignup = () => {
     let isValidPassword = validatePassword(password);
     if (isValidEmail && isValidPassword) {
       dispatch(signup({ username, email, password }));
+    }
+    if (!isValidEmail) {
+      console.log("Invalid email");
+      setEmailErrors("Please enter a valid email");
     } else {
-      if (!isValidEmail) {
-        setEmailErrors({
-          type: "email",
-          message: "You entered an invalid email",
-        });
-      }
-      if (!isValidPassword) {
-        setPasswordErrors({
-          type: "password",
-          message: "Your password is incorrect",
-        });
-      }
+      console.log("valid email");
+      setEmailErrors("");
+    }
+    if (!isValidPassword) {
+      console.log("Invalid password");
+      setPasswordErrors("Your password is incorrect");
+    } else {
+      setPasswordErrors("");
     }
 
-    console.log("isvalidemail", isValidEmail);
-    console.log("isvalidpassword", isValidPassword);
+    console.log("isValidEmail:", isValidEmail, emailErrors);
+    console.log("isValidPassword:", isValidPassword, passwordErrors);
   };
 
   const handleLogin = (e) => {
@@ -84,9 +81,7 @@ export const LoginSignup = () => {
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           />
-          {emailErrors.type === "email" && (
-            <small color="red">{emailErrors.message}</small>
-          )}
+          {<small color="red">{emailErrors}</small>}
         </div>
         <div className="input">
           <RiLockPasswordLine className="icons password" />
@@ -95,9 +90,7 @@ export const LoginSignup = () => {
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          {passwordErrors.type === "password" && (
-            <small color="red">{passwordErrors.message}</small>
-          )}
+          {<small color="red">{passwordErrors}</small>}
         </div>
       </div>
       {action === "Sign Up" ? (
